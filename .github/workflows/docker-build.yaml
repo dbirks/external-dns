@@ -31,10 +31,15 @@ jobs:
           EPOCH_TIME=$(date +%s)
           echo "VERSION=$SHORT_COMMIT_HASH-$EPOCH_TIME" >> $GITHUB_ENV
 
-      - name: Install ko
-        run: make ko
+      - name: Install ko and build/push image
+        run: |
+          # Install ko to the path
+          ./scripts/install-ko.sh
 
-      - name: Build and push image using Make
-        run: make build.push
+          # Add ko to the PATH
+          export PATH=$PATH:$(go env GOPATH)/bin
+
+          # Now build and push the image
+          make build.push
         env:
           REGISTRY: ghcr.io/dbirks/external-dns
