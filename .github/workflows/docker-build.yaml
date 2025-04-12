@@ -31,6 +31,9 @@ jobs:
           EPOCH_TIME=$(date +%s)
           echo "VERSION=$SHORT_COMMIT_HASH-$EPOCH_TIME" >> $GITHUB_ENV
 
+      - name: Install ko
+        run: make ko
+
       - name: Build and push image using Make
         run: make build.push
         env:
