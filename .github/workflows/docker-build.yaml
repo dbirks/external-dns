@@ -18,25 +18,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          go-version: '1.22' # Or your project's Go version
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install ko
-        run: go install github.com/google/ko@latest
-
-      - name: Set image tag
+      - name: Set version tag
         run: |
           SHORT_COMMIT_HASH=$(git rev-parse --short HEAD)
           EPOCH_TIME=$(date +%s)
-          echo "IMAGE_TAG=$SHORT_COMMIT_HASH-$EPOCH_TIME" >> $GITHUB_ENV
-          echo "$HOME/go/bin" >> $GITHUB_PATH # Add ko to PATH
+          echo "VERSION=$SHORT_COMMIT_HASH-$EPOCH_TIME" >> $GITHUB_ENV
 
-      - name: Login to GitHub Container Registry using ko
-        run: ko login ghcr.io --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push image using ko
-        run: ko publish --tags ${{ env.IMAGE_TAG }} ./cmd/external-dns
+      - name: Build and push image using Make
+        run: make build.push
         env:
-          KO_DOCKER_REPO: ghcr.io/dbirks/external-dns
+          REGISTRY: ghcr.io/dbirks/external-dns
