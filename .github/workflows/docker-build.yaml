@@ -42,4 +42,4 @@ jobs:
           # Now build and push the image
           make build.push
         env:
-          REGISTRY: ghcr.io/dbirks/external-dns
+          IMAGE: ghcr.io/dbirks/external-dns
